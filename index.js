@@ -25,6 +25,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
+
+    const smartTechCollection = client.db("smartTechDB").collection("products");
+
+    app.get("/products", async (req, res) => {
+      const cursor = smartTechCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/products", async (req, res) => {
+      const newProduct = req.body;
+      // console.log(newProduct);
+      const result = await smartTechCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
