@@ -77,6 +77,19 @@ async function run() {
     });
 
     // add to cart operation
+    app.get("/addProducts", async (req, res) => {
+      const cursor = addProductsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/addProducts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await addProductsCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/addProducts", async (req, res) => {
       const addProduct = req.body;
       console.log(addProduct);
@@ -84,9 +97,11 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/addProducts", async (req, res) => {
-      const cursor = addProductsCollection.find();
-      const result = await cursor.toArray();
+    app.delete("/addProducts/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await addProductsCollection.deleteOne(query);
       res.send(result);
     });
 
