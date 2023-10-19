@@ -26,10 +26,13 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
 
-    const smartTechCollection = client.db("smartTechDB").collection("products");
+    const productsCollection = client.db("smartTechDB").collection("products");
+    const addProductsCollection = client
+      .db("smartTechDB")
+      .collection("addProducts");
 
     app.get("/products", async (req, res) => {
-      const cursor = smartTechCollection.find();
+      const cursor = productsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -37,14 +40,14 @@ async function run() {
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result = await smartTechCollection.findOne(query);
+      const result = await productsCollection.findOne(query);
       res.send(result);
     });
 
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       // console.log(newProduct);
-      const result = await smartTechCollection.insertOne(newProduct);
+      const result = await productsCollection.insertOne(newProduct);
       res.send(result);
     });
 
@@ -65,11 +68,25 @@ async function run() {
           description: updateRequest.description,
         },
       };
-      const result = await smartTechCollection.updateOne(
+      const result = await productsCollection.updateOne(
         filter,
         updateProduct,
         options
       );
+      res.send(result);
+    });
+
+    // add to cart operation
+    app.post("/addProducts", async (req, res) => {
+      const addProduct = req.body;
+      console.log(addProduct);
+      const result = await addProductsCollection.insertOne(addProduct);
+      res.send(result);
+    });
+
+    app.get("/addProducts", async (req, res) => {
+      const cursor = addProductsCollection.find();
+      const result = await cursor.toArray();
       res.send(result);
     });
 
@@ -91,7 +108,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on the: ${port}`);
 });
-
-// najrulislam38
-
-// t8XHrGE0bDKjUFI6
