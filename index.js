@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -34,10 +34,42 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await smartTechCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       // console.log(newProduct);
       const result = await smartTechCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
+    // image, name, brandName, type, price, rating, description
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateRequest = req.body;
+      const options = { upsert: true };
+      const updateProduct = {
+        $set: {
+          image: updateRequest.image,
+          name: updateRequest.name,
+          brandName: updateRequest.brandName,
+          type: updateRequest.type,
+          price: updateRequest.price,
+          rating: updateRequest.rating,
+          description: updateRequest.description,
+        },
+      };
+      const result = await smartTechCollection.updateOne(
+        filter,
+        updateProduct,
+        options
+      );
       res.send(result);
     });
 
